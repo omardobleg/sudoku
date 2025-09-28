@@ -1,0 +1,19 @@
+import { effect, track } from 'ripple';
+import type { Tracked } from 'ripple';
+export component Dialog({ show }: { show: Tracked<boolean> }) {
+	let dialog: Tracked<HTMLDialogElement> = track<HTMLDialogElement>();
+	effect(() => {
+		if (@show) {
+			@dialog.showModal();
+		}
+	});
+	const dialogRef = node => {
+		@dialog = node;
+
+		return () => {
+			@dialog = undefined;
+		};
+	};
+
+	<dialog {ref dialogRef} class='mx-auto mt-18 rounded-xl bg-white p-6 shadow-3xl backdrop:bg-black/50 backdrop:backdrop-blur-md'><form method='dialog'><button class='text-4xl'>{'Winner'}</button></form></dialog>
+}

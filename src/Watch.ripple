@@ -1,0 +1,37 @@
+import { track, effect } from 'ripple';
+
+export component Watch({ start }: { start: Date }) {
+	const now = track(new Date());
+	const difference = track(() => @now.getTime() - start.getTime());
+	const resultInSeconds = track(() => Math.round(@difference / 1000));
+	const formated = track(() => stopwatch(@resultInSeconds));
+	effect(() => {
+		const ref = setInterval(() => {
+			@now = new Date();
+		}, 1000);
+
+		return () => clearInterval(ref);
+	});
+
+	<div class='text-3xl bold tracking-widest font-mono font-bold border-2 border-indigo-500 p-1 rounded-sm text-indigo-500 bg-indigo-50'>
+		<span>{@formated.minutes}</span>
+		{':'}
+		<span>{@formated.seconds}</span>
+	</div>
+}
+
+function stopwatch(rawSeconds: number) {
+	const minutes = Math.floor(rawSeconds / 60);
+	const seconds = rawSeconds % 60;
+
+	return {
+		minutes: pad(minutes),
+		seconds: pad(seconds),
+	};
+}
+
+function pad(digit: number) {
+	const asString = String(digit);
+
+	return asString.length > 1 ? asString : `0${asString}`;
+}

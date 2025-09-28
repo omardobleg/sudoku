@@ -1,0 +1,84 @@
+import { track, TrackedMap } from 'ripple';
+import type { Tracked } from 'ripple';
+import type { Difficulty } from './types.ts';
+import { getSudoku } from 'sudoku-gen';
+
+export function chunkString(str: string, size: number) {
+	const chunks: string[] = [];
+
+	for (let i = 0; i < size; i++) {
+		const step = size / 3
+		let temp = []
+		let index = 18 + i - step * 2
+
+		if (i < 3) index = i; else if (i >= 3 && i < 6) index = 9 + i - step;
+		let firstPointer = step * index
+		temp.push(...str.slice(firstPointer, firstPointer + step));
+		let secondPointer = step * index + size
+		temp.push(...str.slice(secondPointer, secondPointer + step));
+		let thirdPointer = step * index + size * 2
+		temp.push(...str.slice(thirdPointer, thirdPointer + step));
+		chunks.push(temp.join(''));
+	}
+
+	return chunks;
+}
+export function createdTrackedCell(value: string, solution: string) {
+	const cell = track(value);
+	const solCell = track(solution);
+	const isDefaultValue = track(() => @cell === '-');
+	const isRight = track(() => @isDefaultValue || @cell === @solCell);
+
+	return {
+		cell,
+		solCell,
+		isRight,
+		isDefaultValue,
+	};
+}
+
+export function createSudoku(difficulty: Tracked<Difficulty>, size: number) {
+	const sudokuFactory = getSudoku(@difficulty);
+	const cells = chunkString(sudokuFactory.puzzle, size);
+	const sols = chunkString(sudokuFactory.solution, size);
+	let sudoku = new TrackedMap(cells.map((val, key) => [key, val]));
+	let solution = new Map(sols.map((val, key) => [key, val]));
+	const startTime = new Date();
+
+	return {
+		sudoku,
+		solution,
+		startTime,
+	};
+}
+export function solveSudoku(sudoku: Map<index, string>, solution: Map<number, string>) {
+	if (!completedSudoku(sudoku)) {
+		return false;
+	}
+	for (let item of sudoku) {
+		const key = item[0]
+		const val = item[1]
+		let testVal = @solution.get(key)
+
+		if (@testVal !== @val) {
+			return false;
+		}
+	}
+
+	return true;
+}
+function completedSudoku(sudoku: Map<index, string>) {
+	return !stringifySudoku(sudoku).includes('-');
+}
+export function stringifySudoku(sudoku: Map<index, string>): string {
+	let chain = '';
+
+	for (const item of sudoku) {
+		chain += item[1];
+	}
+
+	return chain;
+}
+export function replaceString(str: string, index: number, replacement: string) {
+	return str.substring(0, index) + replacement + str.substring(index + replacement.length);
+}

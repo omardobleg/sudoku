@@ -1,0 +1,17 @@
+import type { Tracked } from 'ripple';
+
+export component EditCell({ cell }: { cell: Tracked<string> }) {
+	<input class='max-w-6 inline aspect-square text-center' onFocus={event => {
+			if (event.target.value === '-') {
+				event.target.value = '';
+			}
+		}} onChange={event => {
+			const target = event.target as HTMLInputElement;
+			const value = target.value;
+
+			if (Number(value) > 9 || Number(value) < 1 || !value) {
+				target.value = '-';
+			}
+			@cell = value;
+		}} name={@cell} inputmode='numeric' type='text' value='-' />
+}
