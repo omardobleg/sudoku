@@ -1,21 +1,23 @@
 import { EditCell } from './EditCell.ripple';
-import { effect } from 'ripple';
+import { effect, track, TrackedArray } from 'ripple';
 import { createdTrackedCell, replaceString } from './helper.ripple';
 
 type SquareProps = { grid: string; solution: string; updateSquare: Function };
 export component Square(props: SquareProps) {
-	<div class='grid grid-cols-3 gap-1 bg-white'>for (let cells of Array.from(props.grid).entries()) {
-		const { cell, isRight, isDefaultValue } = createdTrackedCell(cells[1], props.solution[cells[0]])
+	const squares = track(() => TrackedArray.from(props.grid));
+
+	<div class='grid grid-cols-3 gap-1 bg-white'>for (const items of @squares.entries()) {
+		const cells = items[1]
+		const i = items[0]
+		const { cell, isRight, isDefaultValue } = createdTrackedCell(cells, props.solution[i])
 		effect(() => {
 			if (@isRight && !props.grid.includes(@cell)) {
-				const resp = replaceString(props.grid, cells[0], @cell)
+				const resp = replaceString(props.grid, i, @cell)
 				props.updateSquare(resp);
 			}
 		});
 
-		<div class={`font-mono flex justify-center items-center font-bold text-xl 
-			${@isDefaultValue ? 'bg-indigo-50' : 'bg-indigo-200 '}
-			${!@isRight ? 'border-3 border-red-400' : 'border-transparent'}`}>if (@isDefaultValue || !@isRight) {
+		<div class={['font-mono flex justify-center items-center font-bold text-xl', @isDefaultValue ? 'bg-indigo-50' : 'bg-indigo-200 ', !@isRight ? 'border-3 border-red-400' : 'border-transparent']}>if (@isDefaultValue || !@isRight) {
 			<EditCell cell={cell} />
 		} else {
 			<span>{@cell}</span>

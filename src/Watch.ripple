@@ -1,13 +1,18 @@
-import { track, effect } from 'ripple';
+import { track, effect, TrackedDate } from 'ripple';
 
 export component Watch({ start }: { start: Date }) {
-	const now = track(new Date());
-	const difference = track(() => @now.getTime() - start.getTime());
+	let now = new TrackedDate();
+	const difference = track(() => now.getTime() - start.getTime());
 	const resultInSeconds = track(() => Math.round(@difference / 1000));
 	const formated = track(() => stopwatch(@resultInSeconds));
 	effect(() => {
 		const ref = setInterval(() => {
-			@now = new Date();
+			const newDate = new Date();
+
+			now.setMinutes(newDate.getMinutes());
+			now.setSeconds(newDate.getSeconds());
+			now.setMilliseconds(newDate.getMilliseconds());
+			now.setDate(newDate.getDate());
 		}, 1000);
 
 		return () => clearInterval(ref);

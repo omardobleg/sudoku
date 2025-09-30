@@ -1,7 +1,6 @@
-import { track, TrackedMap } from 'ripple';
+import { track } from 'ripple';
 import type { Tracked } from 'ripple';
 import type { Difficulty } from './types.ts';
-import { getSudoku } from 'sudoku-gen';
 
 export function chunkString(str: string, size: number) {
 	const chunks: string[] = [];
@@ -37,48 +36,6 @@ export function createdTrackedCell(value: string, solution: string) {
 	};
 }
 
-export function createSudoku(difficulty: Tracked<Difficulty>, size: number) {
-	const sudokuFactory = getSudoku(@difficulty);
-	const cells = chunkString(sudokuFactory.puzzle, size);
-	const sols = chunkString(sudokuFactory.solution, size);
-	let sudoku = new TrackedMap(cells.map((val, key) => [key, val]));
-	let solution = new Map(sols.map((val, key) => [key, val]));
-	const startTime = new Date();
-
-	return {
-		sudoku,
-		solution,
-		startTime,
-	};
-}
-export function solveSudoku(sudoku: Map<index, string>, solution: Map<number, string>) {
-	if (!completedSudoku(sudoku)) {
-		return false;
-	}
-	for (let item of sudoku) {
-		const key = item[0]
-		const val = item[1]
-		let testVal = @solution.get(key)
-
-		if (@testVal !== @val) {
-			return false;
-		}
-	}
-
-	return true;
-}
-function completedSudoku(sudoku: Map<index, string>) {
-	return !stringifySudoku(sudoku).includes('-');
-}
-export function stringifySudoku(sudoku: Map<index, string>): string {
-	let chain = '';
-
-	for (const item of sudoku) {
-		chain += item[1];
-	}
-
-	return chain;
-}
 export function replaceString(str: string, index: number, replacement: string) {
 	return str.substring(0, index) + replacement + str.substring(index + replacement.length);
 }

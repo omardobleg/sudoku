@@ -1,0 +1,69 @@
+import type { Tracked } from 'ripple';
+import { getSudoku } from 'sudoku-gen';
+import { chunkString } from './helper.ripple';
+
+export function createSudoku(difficulty: Tracked<Difficulty>, size: number) {
+	const sudokuFactory = getSudoku(@difficulty);
+	const cells = chunkString(sudokuFactory.puzzle, size);
+	const sols = chunkString(sudokuFactory.solution, size);
+	let sudoku = new Map(cells.map((val, key) => [key, val]));
+	let solution = new Map(sols.map((val, key) => [key, val]));
+	const startTime = new Date();
+	console.log('New sudoku', sudokuFactory);
+	printSolution(sudokuFactory.solution);
+
+	return {
+		sudoku,
+		solution,
+		startTime,
+	};
+}
+
+export function solveSudoku(sudoku: Map<index, string>, solution: Map<number, string>) {
+	if (!completedSudoku(sudoku)) {
+		return false;
+	}
+	for (let item of sudoku) {
+		const key = item[0]
+		const val = item[1]
+		let testVal = @solution.get(key)
+
+		if (@testVal !== @val) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+function completedSudoku(sudoku: Map<index, string>) {
+	return !stringifySudoku(sudoku).includes('-');
+}
+export function stringifySudoku(sudoku: Map<index, string>): string {
+	let chain = '';
+
+	for (const item of sudoku) {
+		chain += item[1];
+	}
+
+	return chain;
+}
+function printSolution(solution: string) {
+	const squares = printSquare(solution, 9);
+
+	for (const item of squares.entries()) {
+		const square = item[1]
+		const index = item[0] + 1
+		console.log(printSquare(square).join('  |  '));
+		if (index && index % 3 === 0) {
+			console.log('--------------------');
+		}
+	}
+}
+function printSquare(line: string, size = 3) {
+	return line.match(new RegExp('.{1,' + size + '}', 'g'));
+}
+
+function printRow(row: string[]) {
+	console.log(row.join('----\n')); // for (const r of row) { // 	console.log(r, '\t'); // }
+}

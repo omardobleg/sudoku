@@ -2,18 +2,21 @@ import type { Component, TrackedMap } from 'ripple';
 import { Config } from './context.ripple';
 type BoardProps = {
 	sudoku: TrackedMap<number, string>;
-	solution: TrackedMap<number, string>;
-	children: Component<{ grid: string[] }>
+	solution: Map<number, string>;
+	square: Tracked<Component<{ grid: string[] }>>
 };
-export component Board({ solution, sudoku, children }: BoardProps) {
+export component Board({ solution, sudoku, square }: BoardProps) {
 	const size = Config.get().size;
 	const items = Array.from({
 		length: size,
 	}, (v, i) => i);
 
 	<section class='border-4 border-indigo-500 w-full h-full grid grid-cols-3 gap-1 bg-indigo-500'>for (const index of items.keys()) {
-		const updateSquare = (str: string) => @sudoku.set(index, str)
+		const updateSquare = (str: string) => {
+			@sudoku.set(index, str);
+			console.log('update square', @sudoku);
+		}
 
-		<children grid={sudoku.get(index)} solution={solution.get(index)} updateSquare={updateSquare} />
+		<@square grid={@sudoku.get(index)} solution={solution.get(index)} updateSquare={updateSquare} />
 	}</section>
 }
