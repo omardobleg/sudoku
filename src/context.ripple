@@ -1,12 +1,12 @@
-import type { Difficulty } from './types.ts';
+import type { Difficulty } from './types';
 import { Context } from 'ripple';
 
 export const Config = new Context({
 	size: 9,
 	difficulty: [
-	'easy',
-	'medium',
-	'hard',
-	'expert'
+		'easy',
+		'medium',
+		'hard',
+		'expert',
 	] as Difficulty[],
 });

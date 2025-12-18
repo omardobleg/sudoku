@@ -1,21 +1,19 @@
 import { track } from 'ripple';
-import type { Tracked } from 'ripple';
-import type { Difficulty } from './types.ts';
 
 export function chunkString(str: string, size: number) {
 	const chunks: string[] = [];
 
 	for (let i = 0; i < size; i++) {
-		const step = size / 3
-		let temp = []
-		let index = 18 + i - step * 2
+		const step = size / 3;
+		let temp = [];
+		let index = 18 + i - step * 2;
 
 		if (i < 3) index = i; else if (i >= 3 && i < 6) index = 9 + i - step;
-		let firstPointer = step * index
+		let firstPointer = step * index;
 		temp.push(...str.slice(firstPointer, firstPointer + step));
-		let secondPointer = step * index + size
+		let secondPointer = step * index + size;
 		temp.push(...str.slice(secondPointer, secondPointer + step));
-		let thirdPointer = step * index + size * 2
+		let thirdPointer = step * index + size * 2;
 		temp.push(...str.slice(thirdPointer, thirdPointer + step));
 		chunks.push(temp.join(''));
 	}
