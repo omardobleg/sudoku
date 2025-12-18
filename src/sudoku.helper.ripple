@@ -65,7 +65,3 @@ function printSolution(solution: string) {
 function printSquare(line: string, size = 3) {
 	return line.match(new RegExp('.{1,' + size + '}', 'g'));
 }
-
-function printRow(row: string[]) {
-	console.log(row.join('----\n')); // for (const r of row) { // 	console.log(r, '\t'); // }
-}
